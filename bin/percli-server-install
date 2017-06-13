@@ -1,0 +1,48 @@
+#!/usr/bin/env node
+
+var fs      = require('fs')
+
+var args    = require('commander')
+
+var banner  = require('../lib/banner.js')
+var fetch   = require('../lib/fetch.js')
+
+args.version('1.0.0')
+//	.option('-f, --force', 'force the installation')
+	.parse(process.argv)
+
+banner.banner()
+
+function fetchSlingAndPackageList() {
+
+    fetch.onComplete(function() {
+        parsePackageListAndDownload()
+    })
+
+    // fetch sling
+    // fetch.fetch('https://vagrant.headwire.com/sling/9/org.apache.sling.launchpad-9-SNAPSHOT.jar', 'sling.jar')
+
+    // fetch list of peregrine bundles
+    fetch.fetch('https://vagrant.headwire.com/peregrine/packages.txt', 'packages.txt')
+}
+
+function parsePackageListAndDownload() {
+    var lines = fs.readFileSync('packages.txt').toString().split('\n')
+    fetch.onComplete(function() {
+        installPackages()
+    })
+    lines.forEach(function(line) {
+        if(line.length > 0) {
+            fetch.fetch('https://vagrant.headwire.com/peregrine/'+line, line)
+        }
+    })
+}
+
+function installPackages() {
+    console.log('time to install')
+}
+
+fetchSlingAndPackageList()
+// fetch bundles
+// start peregrine
+// install bundles

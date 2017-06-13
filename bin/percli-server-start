@@ -1,0 +1,53 @@
+#!/usr/bin/env node
+
+var fs      = require('fs')
+var http    = require('http');
+const { spawn } = require('child_process');
+
+var args    = require('commander')
+
+var banner  = require('../lib/banner.js')
+
+function startSling() {
+
+    const child = spawn('java', ['-jar','out/sling.jar'], {
+      detached: true,
+      shell: true,
+      stdio: 'inherit'
+    });
+
+    child.unref();
+}
+
+const checkIfRunning = function () {
+    new Promise((resolve, reject) => {
+        http.get('http://admin:admin@localhost:8080/index.html', function(res) {
+          let rawData = '';
+          res.on('data', (chunk) => { rawData += chunk; });
+          res.on('end', () => {
+            try {
+              console.log('sling is running')
+              resolve()
+            } catch (e) {
+              console.error(e.message);
+              reject()
+            }
+          });
+      }).on('error', (e) => {
+        if(e.code === 'ECONNREFUSED') {
+            reject()
+        }
+        console.error(`Got error: ${JSON.stringify(e)}`);
+      })
+    })
+}
+
+args.version('1.0.0')
+	.parse(process.argv)
+
+banner.banner()
+
+checkIfRunning().then( () => { console.log('running') })
+
+startSling()
+
