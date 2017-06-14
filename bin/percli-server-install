@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-var fs      = require('fs')
+var fs      = require('fs-extra')
 var args    = require('commander')
 var axios   = require('axios')
 var asciify = require('asciify')
@@ -11,13 +11,13 @@ args.version('1.0.0')
 
 /* functions that return promises dont need to be async */
 
-/* Step 0 ==========
+/* Step 1 ==========
 ==================== */
 async function getBanner(){
     return asciify('peregrine cms', {font:'big'}, function(err, res){ console.log(res) });
 }
 
-/* Step 0.5 ========
+/* Step 2 ==========
 ==================== */
 function getSlingExe(){
     return axios({
@@ -31,13 +31,13 @@ function getSlingExe(){
     .catch(err => console.log('download err: ', 'launchpad-9-SNAPSHOT.jar'))
 }
 
-/* Step 1 ==========
+/* Step 3 ==========
 ==================== */
 function getPackageList(){
     return axios.get('https://vagrant.headwire.com/peregrine/packages.txt')
 }
 
-/* Step 2 ==========
+/* Step 4 ==========
 ==================== */
 function downloadPackages(packages){
     var lines = packages.split('\n')
@@ -55,7 +55,7 @@ function downloadPackages(packages){
     }))
 }
 
-/* Step 3 ==========
+/* Step 5 ==========
 ==================== */
 async function installPackages(packages){
     console.log('time to install')
@@ -65,15 +65,15 @@ async function installPackages(packages){
 ========================== */
 async function serverInstall() {  
   try {
-    // step 0
-    await getBanner()
-    // step 0.5
-    await getSlingExe()
     // step 1
-    let packagesList = await getPackageList()
+    await getBanner()
     // step 2
-    await downloadPackages(packagesList.data)
+    await getSlingExe()
     // step 3
+    let packagesList = await getPackageList()
+    // step 4
+    await downloadPackages(packagesList.data)
+    // step 5
     await installPackages()
   } catch (err) {
     console.error('serverInstall err')
