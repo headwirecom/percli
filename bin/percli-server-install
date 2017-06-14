@@ -4,9 +4,13 @@ var fs      = require('fs-extra')
 var args    = require('commander')
 var axios   = require('axios')
 var asciify = require('asciify')
+const maven = require('maven')
+const tasks = require('../lib/tasks')
 
 args.version('1.0.0')
-//	.option('-f, --force', 'force the installation')
+	.option('-d, --download', 'only download')
+	.option('-e, --existing', 'install on running server')
+	.option('-i, --install',  'only install')
 	.parse(process.argv)
 
 /* functions that return promises dont need to be async */
@@ -59,10 +63,24 @@ function downloadPackages(packages){
     }))
 }
 
+async function installFile(mvn, line) {
+    return     mvn.execute(
+                   ['io.wcm.maven.plugins:wcmio-content-package-maven-plugin:install'], {
+                   "sling.port": "8080",
+                   "vault.file": "out/" + line,
+                   "vault.serviceURL": "http://localhost:8080/bin/cpm/package.service.html"
+               })
+
+}
 /* Step 5 ==========
 ==================== */
 async function installPackages(packages){
     console.log('time to install')
+    let mvn = maven.create()
+    let files = packages.data.split('\n').filter((line) => { return line.length != 0})
+    for(let i = 0; i < files.length; i++) {
+        await installFile(mvn, files[i])
+    }
 }
 
 /* Flow Control ==========
@@ -73,15 +91,25 @@ async function serverInstall() {
     // step 1
     await getBanner()
     // step 2
-    await getSlingExe()
-    // step 3
     let packagesList = await getPackageList()
-    // step 4
-    await downloadPackages(packagesList.data)
+    if(!args.install) {
+        await getSlingExe()
+        // step 3
+        // step 4
+        await downloadPackages(packagesList.data)
+    }
     // step 5
-    await installPackages()
+    if(!args.existing) {
+        await tasks.startPeregrine()
+    }
+
+    // step 6
+    if(!args.download) {
+        await installPackages(packagesList)
+    }
   } catch (err) {
     console.error('serverInstall err')
+    console.error(err)
   }
 }
 
