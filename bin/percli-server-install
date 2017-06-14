@@ -10,11 +10,27 @@ args.version('1.0.0')
 	.parse(process.argv)
 
 /* functions that return promises dont need to be async */
+
 /* Step 0 ==========
 ==================== */
 async function getBanner(){
     return asciify('peregrine cms', {font:'big'}, function(err, res){ console.log(res) });
 }
+
+/* Step 0.5 ========
+==================== */
+function getSlingExe(){
+    return axios({
+      method:'get',
+      url: 'https://vagrant.headwire.com/sling/9/org.apache.sling.launchpad-9-SNAPSHOT.jar',
+      responseType:'stream'
+    })
+    .then(function(res) {
+      res.data.pipe(fs.createWriteStream('out/launchpad-9-SNAPSHOT.jar'))
+    })
+    .catch(err => console.log('download err: ', 'launchpad-9-SNAPSHOT.jar'))
+}
+
 /* Step 1 ==========
 ==================== */
 function getPackageList(){
@@ -35,7 +51,7 @@ function downloadPackages(packages){
         .then(function(res) {
           res.data.pipe(fs.createWriteStream('out/' +line))
         })
-        .catch(err => console.log('download err'))
+        .catch(err => console.log('download err: ', line))
     }))
 }
 
@@ -51,6 +67,8 @@ async function serverInstall() {
   try {
     // step 0
     await getBanner()
+    // step 0.5
+    await getSlingExe()
     // step 1
     let packagesList = await getPackageList()
     // step 2
@@ -63,7 +81,3 @@ async function serverInstall() {
 }
 
 serverInstall()
-// fetchSlingAndPackageList()
-// fetch bundles
-// start peregrine
-// install bundles
