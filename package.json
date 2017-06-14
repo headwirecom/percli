@@ -1,8 +1,14 @@
 {
   "name": "percli",
-  "version": "1.0.0",
-  "description": "peregrine cms cli tool",
-  "main": "percli.js",
+  "version": "0.1.0-alpha",
+  "description": "peregrine-cms cli tool",
+  "main": "/bin/percli",
+  "keywords": [
+    "cms",
+    "sling",
+    "vuejs",
+    "peregrine-cms"
+  ],
   "bin": {
     "percli": "bin/percli",
     "percli-server": "bin/percli-server",
@@ -16,7 +22,7 @@
     "type": "git",
     "url": "git+https://github.com/headwirecom/percli.git"
   },
-  "author": "Ruben Reusser",
+  "author": "peregrine-cms",
   "license": "Apache-2.0",
   "bugs": {
     "url": "https://github.com/headwirecom/percli/issues"
