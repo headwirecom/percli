@@ -22,13 +22,14 @@ async function getBanner(){
 function getSlingExe(){
     return axios({
       method:'get',
-      url: 'https://vagrant.headwire.com/sling/9/org.apache.sling.launchpad-9-SNAPSHOT.jar',
+      url: 'https://vagrant.headwire.com/sling/9/org.apache.sling.launchpad-9.jar',
       responseType:'stream'
     })
     .then(function(res) {
-      res.data.pipe(fs.createWriteStream('out/launchpad-9-SNAPSHOT.jar'))
+        console.log('.')
+      res.data.pipe(fs.createWriteStream('out/sling-9.jar'))
     })
-    .catch(err => console.log('download err: ', 'launchpad-9-SNAPSHOT.jar'))
+    .catch(err => console.log('download err: ', 'sling-9.jar'))
 }
 
 /* Step 3 ==========
@@ -43,6 +44,7 @@ function downloadPackages(packages){
     var lines = packages.split('\n')
     /* create array of requests, axios will d/l them in parallel with axios.all */
     return axios.all(lines.map(line => {
+        if(line.length === 0) return Promise.resolve
         return axios({
           method:'get',
           url: 'https://vagrant.headwire.com/peregrine/' + line,
