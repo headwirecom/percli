@@ -1,48 +1,63 @@
 #!/usr/bin/env node
 
 var fs      = require('fs')
-
 var args    = require('commander')
-
-var banner  = require('../lib/banner.js')
-var fetch   = require('../lib/fetch.js')
+var axios   = require('axios')
+var asciify = require('asciify')
 
 args.version('1.0.0')
 //	.option('-f, --force', 'force the installation')
 	.parse(process.argv)
 
-banner.banner()
-
-function fetchSlingAndPackageList() {
-
-    fetch.onComplete(function() {
-        parsePackageListAndDownload()
-    })
-
-    // fetch sling
-    // fetch.fetch('https://vagrant.headwire.com/sling/9/org.apache.sling.launchpad-9-SNAPSHOT.jar', 'sling.jar')
-
-    // fetch list of peregrine bundles
-    fetch.fetch('https://vagrant.headwire.com/peregrine/packages.txt', 'packages.txt')
+/* Step 0 */
+async function getBanner(){
+    return asciify('peregrine cms', {font:'big'}, function(err, res){ console.log(res) });
+}
+/* Step 1 */
+function getPackageList(){
+    return axios.get('https://vagrant.headwire.com/peregrine/packages.txt')
 }
 
-function parsePackageListAndDownload() {
-    var lines = fs.readFileSync('packages.txt').toString().split('\n')
-    fetch.onComplete(function() {
-        installPackages()
-    })
-    lines.forEach(function(line) {
-        if(line.length > 0) {
-            fetch.fetch('https://vagrant.headwire.com/peregrine/'+line, line)
-        }
-    })
+/* Step 2 */
+function downloadPackages(packages){
+    var lines = packages.split('\n')
+    /* create array of requests, axios will d/l them in parallel with axios.all */
+    return axios.all(lines.map(line => {
+        return axios({
+          method:'get',
+          url: 'https://vagrant.headwire.com/peregrine/' + line,
+          responseType:'stream'
+        })
+        .then(function(res) {
+          res.data.pipe(fs.createWriteStream('out/' +line))
+        })
+        .catch(err => console.log('download err'))
+    }))
 }
 
-function installPackages() {
+/* Step 3 */
+async function installPackages(packages){
     console.log('time to install')
 }
 
-fetchSlingAndPackageList()
+/* run steps in order */
+async function serverInstall() {  
+  try {
+    /* Step0: set banner before anything else*/
+    await getBanner()
+    /* Step1: get packages list */
+    let packagesList = await getPackageList()
+    /* Step2: download packages in list */
+    await downloadPackages(packagesList.data)
+    /* Step3: install packages */
+    await installPackages()
+  } catch (err) {
+    console.error('serverInstall err')
+  }
+}
+
+serverInstall()
+// fetchSlingAndPackageList()
 // fetch bundles
 // start peregrine
 // install bundles
