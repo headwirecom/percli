@@ -20,16 +20,18 @@ async function getBanner(){
 /* Step 2 ==========
 ==================== */
 function getSlingExe(){
-    return axios({
-      method:'get',
-      url: 'https://vagrant.headwire.com/sling/9/org.apache.sling.launchpad-9.jar',
-      responseType:'stream'
+    return new Promise( (resolve, reject) => {
+        axios({
+          method:'get',
+          url: 'https://vagrant.headwire.com/sling/9/org.apache.sling.launchpad-9.jar',
+          responseType:'stream'
+        })
+        .then(function(res) {
+          let stream = res.data.pipe(fs.createWriteStream('out/sling-9.jar'))
+          stream.on('finish', () => { console.log('sling-9 download complete'); resolve() })
+        })
+        .catch(err => console.log('download err: ', 'sling-9.jar'))
     })
-    .then(function(res) {
-        console.log('.')
-      res.data.pipe(fs.createWriteStream('out/sling-9.jar'))
-    })
-    .catch(err => console.log('download err: ', 'sling-9.jar'))
 }
 
 /* Step 3 ==========
