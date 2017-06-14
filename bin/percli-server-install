@@ -9,16 +9,20 @@ args.version('1.0.0')
 //	.option('-f, --force', 'force the installation')
 	.parse(process.argv)
 
-/* Step 0 */
+/* functions that return promises dont need to be async */
+/* Step 0 ==========
+==================== */
 async function getBanner(){
     return asciify('peregrine cms', {font:'big'}, function(err, res){ console.log(res) });
 }
-/* Step 1 */
+/* Step 1 ==========
+==================== */
 function getPackageList(){
     return axios.get('https://vagrant.headwire.com/peregrine/packages.txt')
 }
 
-/* Step 2 */
+/* Step 2 ==========
+==================== */
 function downloadPackages(packages){
     var lines = packages.split('\n')
     /* create array of requests, axios will d/l them in parallel with axios.all */
@@ -35,21 +39,23 @@ function downloadPackages(packages){
     }))
 }
 
-/* Step 3 */
+/* Step 3 ==========
+==================== */
 async function installPackages(packages){
     console.log('time to install')
 }
 
-/* run steps in order */
+/* Flow Control ==========
+========================== */
 async function serverInstall() {  
   try {
-    /* Step0: set banner before anything else*/
+    // step 0
     await getBanner()
-    /* Step1: get packages list */
+    // step 1
     let packagesList = await getPackageList()
-    /* Step2: download packages in list */
+    // step 2
     await downloadPackages(packagesList.data)
-    /* Step3: install packages */
+    // step 3
     await installPackages()
   } catch (err) {
     console.error('serverInstall err')
