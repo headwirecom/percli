@@ -67,7 +67,8 @@ async function installPackages(packages){
 
 /* Flow Control ==========
 ========================== */
-async function serverInstall() {  
+async function serverInstall() {
+  fs.mkdirsSync('out')
   try {
     // step 1
     await getBanner()
