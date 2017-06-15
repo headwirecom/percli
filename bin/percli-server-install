@@ -25,9 +25,9 @@ async function serverInstall() {
     let packagesList = await tasks.getPackageList()
     console.log('step2 complete: package list =', packagesList)
 
-    // step 3
-    // await downloadFile('https://vagrant.headwire.com/sling/9/org.apache.sling.launchpad-9.jar', 'sling-9.jar')
-    // console.log('step3 complete: file downloaded')
+    //step 3
+    await downloadFile('https://vagrant.headwire.com/sling/9/org.apache.sling.launchpad-9.jar', 'sling-9.jar')
+    console.log('step3 complete: file downloaded')
 
     // step 4
     await downloadFiles(packagesList)
