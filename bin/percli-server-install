@@ -26,29 +26,36 @@ args.version('1.0.0')
 async function serverInstall() {
   fs.mkdirsSync('out')
   try {
-    // step 1
-    await peregrineBanner()
-    console.log('step1 complete: banner displayed')
+    if(!args.install) {
+        // step 1
+        await peregrineBanner()
+        console.log('step1 complete: banner displayed')
 
-    // step 2
-    let packagesList = await getPackageList()
-    console.log('step2 complete: package list =', packagesList)
+        // step 2
+        let packagesList = await getPackageList()
+        console.log('step2 complete: package list =', packagesList)
 
-    //step 3
-    await downloadFile('https://vagrant.headwire.com/sling/9/org.apache.sling.launchpad-9.jar', 'sling-9.jar')
-    console.log('step3 complete: file downloaded')
+        //step 3
+        await downloadFile('https://vagrant.headwire.com/sling/9/org.apache.sling.launchpad-9.jar', 'sling-9.jar')
+        console.log('step3 complete: file downloaded')
 
-    // step 4
-    await downloadFiles(packagesList)
-    console.log('step4 complete: files downloaded')
+        // step 4
+        await downloadFiles(packagesList)
+        console.log('step4 complete: files downloaded')
+    }
 
-    // step 5
-    await startPeregrine()
-    console.log('step5 complete: tasks complete')
+    if(!args.download) {
 
-    // step 6
-    await installPackages(packagesList)
-    console.log('step6 complete: packages installed')
+        if(!args.existing) {
+            // step 5
+            await startPeregrine()
+            console.log('step5 complete: tasks complete')
+        }
+
+        // step 6
+        await installPackages(packagesList)
+        console.log('step6 complete: packages installed')
+    }
 
   } catch (err) {
     console.error('serverInstall err')
