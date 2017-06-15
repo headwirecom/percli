@@ -1,0 +1,41 @@
+#!/usr/bin/env node
+
+const args    = require('commander')
+const process = require('process')
+const fs	  = require('fs')
+const path	  = require('path')
+const maven	  = require('maven')
+
+args.version('1.0.0')
+	.option('-w, --watch', 'watch project and recompile')
+    .option('-d, --deploy', 'deploy to server')
+	.parse(process.argv)
+
+function findProjectRoot(folder) {
+	const pom = folder + '/pom.xml'
+	if(fs.existsSync(pom)) {
+		return folder
+	}
+	const parent = path.normalize(folder+'/..').toString()
+	if(parent === folder) return null
+	return findProjectRoot(parent)
+}
+
+console.log('compiling project')
+
+const projectFolder = findProjectRoot(process.cwd())
+const projectRoot = projectFolder.replace(/\\/g, '/')
+if(projectRoot) {
+	console.log('found pom at', projectRoot)
+	const mvn = maven.create( { cwd: projectRoot })
+	if(args.deploy) {
+		const folderName = projectRoot.split('/').pop()
+		if(folderName === 'core') {
+            mvn.execute(['clean', 'install', '-PautoInstallBundle'])
+		} else {
+            mvn.execute(['clean', 'install', '-PautoInstallPackage'])
+        }
+	} else {
+        mvn.execute(['clean', 'install'])
+    }
+}

@@ -11,6 +11,7 @@
   ],
   "bin": {
     "percli": "bin/percli",
+    "percli-compile": "bin/percli-compile",
     "percli-create": "bin/percli-create",
     "percli-create-project": "bin/percli-create-project",
     "percli-server": "bin/percli-server",
@@ -36,6 +37,7 @@
     "commander": "^2.9.0",
     "fs-extra": "^3.0.1",
     "maven": "^4.2.0",
-    "open": "0.0.5"
+    "open": "0.0.5",
+    "path": "^0.12.7"
   }
 }

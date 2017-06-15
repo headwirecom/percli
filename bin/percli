@@ -6,5 +6,6 @@ args.version('1.0.0')
 	.usage('<command> [options]')
 	.command('server', 'server specific commands')
     .command('create', 'dev tasks')
+    .command('compile', 'compile tasks')
 	.parse(process.argv)
 
