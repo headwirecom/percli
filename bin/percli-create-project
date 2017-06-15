@@ -1,0 +1,31 @@
+#!/usr/bin/env node
+
+const args  = require('commander')
+const maven = require('maven')
+
+args.version('1.0.0')
+	.usage('[options] <projectname>')
+	.parse(process.argv)
+
+if(args.args.length < 1) {
+    args.help()
+}
+
+const projectName = args.args[0]
+const mvn = maven.create()
+
+mvn.execute(['archetype:generate'], {
+    archetypeGroupId: "com.peregrine",
+    archetypeArtifactId: "peregrine-project-archetype",
+    groupId:"com."+projectName,
+    artifactId: projectName,
+    version:"1.0.0-SNAPSHOT",
+    appsFolderName: projectName,
+    artifactName: projectName,
+    contentFolderName: projectName,
+    packageGroup: projectName,
+    slingHostName:"localhost",
+    slingModelSubPackage:"models",
+    slingPort:"8080",
+    interactiveMode:"false"
+})

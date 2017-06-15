@@ -1,0 +1,9 @@
+#!/usr/bin/env node
+
+var args    = require('commander')
+var asciify = require('asciify')
+
+args.version('1.0.0')
+	.command('project', 'install peregrine')
+	.parse(process.argv)
+

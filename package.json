@@ -11,6 +11,8 @@
   ],
   "bin": {
     "percli": "bin/percli",
+    "percli-create": "bin/percli-create",
+    "percli-create-project": "bin/percli-create-project",
     "percli-server": "bin/percli-server",
     "percli-server-install": "bin/percli-server-install",
     "percli-server-start": "bin/percli-server-start"

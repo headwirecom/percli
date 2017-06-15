@@ -4,6 +4,7 @@ var args  = require('commander')
 
 args.version('1.0.0')
 	.usage('<command> [options]')
-	.command('server', 'server specific commands [install|start]')
+	.command('server', 'server specific commands')
+    .command('create', 'dev tasks')
 	.parse(process.argv)
 
