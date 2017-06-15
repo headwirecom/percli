@@ -1,10 +1,19 @@
 #!/usr/bin/env node
 
-const fs        = require('fs-extra')
-const args      = require('commander')
-const tasks     = require('../lib/tasks')
-const { peregrineBanner } = require('../lib/banner')
-const { downloadFile, downloadFiles } = require('../lib/fetch')
+const fs   = require('fs-extra')
+const args = require('commander')
+const { 
+  startPeregrine, 
+  getPackageList, 
+  installPackages 
+} = require('../lib/tasks')
+const { 
+  peregrineBanner 
+} = require('../lib/banner')
+const { 
+  downloadFile, 
+  downloadFiles 
+} = require('../lib/fetch')
 
 args.version('1.0.0')
   .option('-d, --download', 'only download')
@@ -22,7 +31,7 @@ async function serverInstall() {
     console.log('step1 complete: banner displayed')
 
     // step 2
-    let packagesList = await tasks.getPackageList()
+    let packagesList = await getPackageList()
     console.log('step2 complete: package list =', packagesList)
 
     //step 3
@@ -34,11 +43,11 @@ async function serverInstall() {
     console.log('step4 complete: files downloaded')
 
     // step 5
-    await tasks.startPeregrine()
+    await startPeregrine()
     console.log('step5 complete: tasks complete')
 
     // step 6
-    await tasks.installPackages(packagesList)
+    await installPackages(packagesList)
     console.log('step6 complete: packages installed')
 
   } catch (err) {
