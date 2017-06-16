@@ -32,7 +32,7 @@ async function serverInstall() {
         console.log('step1 complete: banner displayed')
 
         // step 2
-        let packagesList = await getPackageList()
+        var packagesList = await getPackageList()
         console.log('step2 complete: package list =', packagesList)
 
         //step 3
