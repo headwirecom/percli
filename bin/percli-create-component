@@ -1,0 +1,122 @@
+#!/usr/bin/env node
+
+const args  = require('commander')
+const maven = require('maven')
+const fs    = require('fs-extra')
+const path  = require('path')
+
+const templates = require('../templates/index.js')
+const generator = require('../lib/generator.js')
+
+args.version('1.0.0')
+	.usage('[options] <componentName>')
+    .option('-c, --container', 'component is a container (may contain other components)')
+    .option('-f, --force', 'force creation (deletes current stub)')
+	.parse(process.argv)
+
+function createDialog(from) {
+    var dialog = { fields: [] }
+    var fields = dialog.fields
+
+    for(var key in from.properties) {
+        var field =from.properties[key]
+        if(!field['x-form-ignore']) {
+            var fieldType = field['x-form-type'] ? field['x-form-type'] : field.type
+            var placeholder = field['x-form-placeholder'] ? field['x-form-placeholder'] : key
+            var label = field['x-form-label'] ? field['x-form-label'] : key
+            switch(fieldType) {
+                case 'string':
+                    fields.push( { type: 'input', inputType: 'text' })
+                    break
+                case 'pathbrowser':
+                    fields.push( {
+                        type: "pathbrowser",
+                        browserRoot: "/content/assets"
+                    })
+                    break
+                case 'texteditor':
+                    fields.push( {
+                        type: "texteditor",
+                        rows: 10
+                    })
+                    break
+                default:
+                    fields.push( { type: 'input', inputType: 'text' })
+                    console.log('unsupported field type', fieldType)
+                    break
+            }
+            fields[fields.length -1].placeholder = placeholder
+            fields[fields.length -1].label       = label
+            fields[fields.length -1].model       = key
+        }
+    }
+    return dialog
+}
+
+
+if(args.args.length < 1) {
+    args.help()
+}
+
+const componentName = args.args[0].toLowerCase()
+const ComponentName = componentName.charAt(0).toUpperCase() + componentName.slice(1)
+
+const settings = JSON.parse(fs.readFileSync('./.properties/settings.json').toString())
+
+const projectName = settings.appname
+
+let templatePath = templates.getPath()
+let projectPath = process.cwd()
+// should check that we are in the root of the project
+// console.log('template  path:',templatePath)
+// console.log('project   path:',projectPath)
+
+let componentPath = path.join(projectPath, './fragments/'+componentName)
+// console.log('component path:',componentPath)
+
+let uiAppsComponentPath = path.join(projectPath, './ui.apps/src/main/content/jcr_root/apps/', projectName, 'components', componentName)
+let coreModelsPath = path.join(projectPath, './core/src/main/java/com', projectName, 'models')
+
+if(!fs.existsSync('./fragments')) {
+
+    console.error()
+    console.error('[ERROR] refusing to create component stub - make sure the fragments directory exists')
+
+} else {
+    if(!args.force && fs.existsSync(componentPath)) {
+        console.error()
+        console.error('[ERROR] refusing to create component stub - stub already exists, use -f to force')
+    } else {
+        fs.mkdirsSync(componentPath)
+
+        fs.writeFileSync(path.join(componentPath, 'template.html')  , templates.getStubHTML())
+        if(args.container) {
+            fs.writeFileSync(path.join(componentPath, 'template.vue')  , templates.getStubVueContainer())
+            fs.writeFileSync(path.join(componentPath, 'model.json')    , templates.getStubModelContainer(ComponentName))
+        } else {
+            fs.writeFileSync(path.join(componentPath, 'template.vue')  , templates.getStubVueComponent())
+            fs.writeFileSync(path.join(componentPath, 'model.json')    , templates.getStubModelComponent(ComponentName))
+        }
+
+        // make .content.xml file for component
+        fs.mkdirsSync(uiAppsComponentPath)
+        fs.writeFileSync(path.join(uiAppsComponentPath, '.content.xml')  , templates.getStubContentXML(componentName))
+
+        // copy template.vue file to component
+        fs.writeFileSync(path.join(uiAppsComponentPath, 'template.vue')  , fs.readFileSync(path.join(componentPath, 'template.vue')).toString())
+
+        const def = JSON.parse(fs.readFileSync(path.join(componentPath, 'model.json')).toString())
+        // make dialog.json for component
+        fs.writeFileSync(path.join(uiAppsComponentPath, 'dialog.json'), JSON.stringify(createDialog(def.definitions[ComponentName], true, 2)))
+
+        // make model for component
+        fs.mkdirsSync(coreModelsPath)
+        def.name = ComponentName
+        def.componentPath = projectName + '/components/' + componentName
+        def.package = 'com.'+projectName+'.models'
+        def.modelName = ComponentName
+        def.classNameParent = 'AbstractComponent'
+        if(args.container) def.classNameParent = 'Container'
+        generator.generate(path.join(templates.getPath(),'model.java.template.java'), path.join(coreModelsPath, ComponentName + 'Model.java'), def)
+    }
+}

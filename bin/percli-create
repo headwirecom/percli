@@ -4,6 +4,7 @@ var args    = require('commander')
 var asciify = require('asciify')
 
 args.version('1.0.0')
-	.command('project', 'install peregrine')
+	.command('project', 'create a peregrine sites project')
+	.command('component', 'create a component shell')
 	.parse(process.argv)
 
