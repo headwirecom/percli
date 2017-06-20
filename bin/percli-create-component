@@ -7,52 +7,13 @@ const path  = require('path')
 
 const templates = require('../templates/index.js')
 const generator = require('../lib/generator.js')
+const functions = require('../lib/functions.js')
 
 args.version('1.0.0')
 	.usage('[options] <componentName>')
     .option('-c, --container', 'component is a container (may contain other components)')
     .option('-f, --force', 'force creation (deletes current stub)')
 	.parse(process.argv)
-
-function createDialog(from) {
-    var dialog = { fields: [] }
-    var fields = dialog.fields
-
-    for(var key in from.properties) {
-        var field =from.properties[key]
-        if(!field['x-form-ignore']) {
-            var fieldType = field['x-form-type'] ? field['x-form-type'] : field.type
-            var placeholder = field['x-form-placeholder'] ? field['x-form-placeholder'] : key
-            var label = field['x-form-label'] ? field['x-form-label'] : key
-            switch(fieldType) {
-                case 'string':
-                    fields.push( { type: 'input', inputType: 'text' })
-                    break
-                case 'pathbrowser':
-                    fields.push( {
-                        type: "pathbrowser",
-                        browserRoot: "/content/assets"
-                    })
-                    break
-                case 'texteditor':
-                    fields.push( {
-                        type: "texteditor",
-                        rows: 10
-                    })
-                    break
-                default:
-                    fields.push( { type: 'input', inputType: 'text' })
-                    console.log('unsupported field type', fieldType)
-                    break
-            }
-            fields[fields.length -1].placeholder = placeholder
-            fields[fields.length -1].label       = label
-            fields[fields.length -1].model       = key
-        }
-    }
-    return dialog
-}
-
 
 if(args.args.length < 1) {
     args.help()
@@ -109,7 +70,7 @@ if(!fs.existsSync('./fragments')) {
 
         const def = JSON.parse(fs.readFileSync(path.join(componentPath, 'model.json')).toString())
         // make dialog.json for component
-        fs.writeFileSync(path.join(uiAppsComponentPath, 'dialog.json'), JSON.stringify(createDialog(def.definitions[ComponentName], true, 2)))
+        fs.writeFileSync(path.join(uiAppsComponentPath, 'dialog.json'), JSON.stringify(functions.createDialog(def.definitions[ComponentName], true, 2)))
 
         // make model for component
         fs.mkdirsSync(coreModelsPath)

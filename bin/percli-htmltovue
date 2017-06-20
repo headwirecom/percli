@@ -57,7 +57,7 @@ fs.writeFileSync(path.join(uiAppsComponentPath, 'template.vue')  , fs.readFileSy
 
 const def = JSON.parse(fs.readFileSync(path.join(componentPath, 'model.json')).toString())
 // make dialog.json for component
-//        fs.writeFileSync(path.join(uiAppsComponentPath, 'dialog.json'), JSON.stringify(createDialog(def.definitions[ComponentName], true, 2)))
+fs.writeFileSync(path.join(uiAppsComponentPath, 'dialog.json'), JSON.stringify(functions.createDialog(def.definitions[ComponentName], true, 2)))
 
 // make model for component
 fs.mkdirsSync(coreModelsPath)
