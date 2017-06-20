@@ -2,6 +2,8 @@
 
 const args  = require('commander')
 const maven = require('maven')
+const path  = require('path')
+const fileUrl = require('file-url')
 
 args.version('1.0.0')
 	.usage('[options] <projectname>')
@@ -14,7 +16,9 @@ if(args.args.length < 1) {
 const projectName = args.args[0]
 const mvn = maven.create()
 
-mvn.execute(['archetype:generate'], {
+const percli = fileUrl(path.join(__dirname, '..'))
+
+mvn.execute(['archetype:generate', '--settings', path.join(__dirname, '..', 'maven', 'settings.xml')], {
     archetypeGroupId: "com.peregrine",
     archetypeArtifactId: "peregrine-project-archetype",
     groupId:"com."+projectName,
@@ -27,5 +31,6 @@ mvn.execute(['archetype:generate'], {
     slingHostName:"localhost",
     slingModelSubPackage:"models",
     slingPort:"8080",
-    interactiveMode:"false"
+    interactiveMode:"false",
+    percli: percli
 })
