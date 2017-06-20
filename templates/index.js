@@ -86,5 +86,25 @@ module.exports = {
           jcr:primaryType="per:Component"
           jcr:title="${name}"
           />`
+    },
+
+    getStubHtmlToVueContainer() {
+        return ``+
+`module.exports = {
+    convert: function($, f) {
+        f.bindPath($)
+        f.addPlaceholders($)
     }
+}`
+    },
+
+    getStubHtmlToVueComponent() {
+        return ``+
+`module.exports = {
+    convert: function($, f) {
+        f.bindPath($)
+    }
+}`
+    }
+
 }

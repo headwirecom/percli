@@ -93,9 +93,11 @@ if(!fs.existsSync('./fragments')) {
         if(args.container) {
             fs.writeFileSync(path.join(componentPath, 'template.vue')  , templates.getStubVueContainer())
             fs.writeFileSync(path.join(componentPath, 'model.json')    , templates.getStubModelContainer(ComponentName))
+            fs.writeFileSync(path.join(componentPath, 'htmltovue.js')  , templates.getStubHtmlToVueContainer())
         } else {
             fs.writeFileSync(path.join(componentPath, 'template.vue')  , templates.getStubVueComponent())
             fs.writeFileSync(path.join(componentPath, 'model.json')    , templates.getStubModelComponent(ComponentName))
+            fs.writeFileSync(path.join(componentPath, 'htmltovue.js')  , templates.getStubHtmlToVueComponent())
         }
 
         // make .content.xml file for component
