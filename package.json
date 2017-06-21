@@ -1,6 +1,6 @@
 {
   "name": "percli",
-  "version": "0.1.5-alpha",
+  "version": "0.1.6-alpha",
   "description": "peregrine-cms cli tool",
   "main": "/bin/percli",
   "keywords": [
@@ -9,6 +9,9 @@
     "vuejs",
     "peregrine-cms"
   ],
+  "engines": {
+    "node": ">7.10.0"
+  },
   "bin": {
     "percli": "bin/percli",
     "percli-compile": "bin/percli-compile",
@@ -42,6 +45,7 @@
     "fs-extra": "^3.0.1",
     "maven": "^4.2.0",
     "open": "0.0.5",
-    "path": "^0.12.7"
+    "path": "^0.12.7",
+    "semver": "^5.3.0"
   }
 }
