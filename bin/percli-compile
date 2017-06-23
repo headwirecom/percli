@@ -5,6 +5,8 @@ const process = require('process')
 const fs	  = require('fs')
 const path	  = require('path')
 const maven	  = require('maven')
+const watch   = require('node-watch');
+const ignore  = require('ignore')
 
 args.version('1.0.0')
 	.option('-w, --watch', 'watch project and recompile')
@@ -21,21 +23,89 @@ function findProjectRoot(folder) {
 	return findProjectRoot(parent)
 }
 
-console.log('compiling project')
+function findCommonRoot(left, right) {
+    let relative = path.relative(left, right)
+    console.log(relative)
+    // needs fixing, find the common anchestor
+    return left
+}
 
-const projectFolder = findProjectRoot(process.cwd())
-const projectRoot = projectFolder.replace(/\\/g, '/')
-if(projectRoot) {
-	console.log('found pom at', projectRoot)
-	const mvn = maven.create( { cwd: projectRoot })
-	if(args.deploy) {
-		const folderName = projectRoot.split('/').pop()
-		if(folderName === 'core') {
-            mvn.execute(['clean', 'install', '-PautoInstallBundle'])
-		} else {
-            mvn.execute(['clean', 'install', '-PautoInstallPackage'])
+let compiling = false
+
+function compile(files) {
+    let shortest = files[0]
+    for(let i = 1; i < files.length; i++) {
+        let item = files[i]
+        if(item.startsWith(shortest)) {
+            // ignore, already shorter
+        } else if(shortest.startsWith(item)) {
+            shortest = item
+        } else {
+            shortest = findCommonRoot(shortest, item)
         }
-	} else {
-        mvn.execute(['clean', 'install'])
     }
+    console.log('shortest path', shortest)
+    build(shortest)
+    compiling = false
+}
+
+
+function build(dir) {
+    const projectFolder = findProjectRoot(dir)
+    const projectRoot = projectFolder.replace(/\\/g, '/')
+    if(projectRoot) {
+        console.log('found pom at', projectRoot)
+        const mvn = maven.create( { cwd: projectRoot })
+        if(args.deploy) {
+            const folderName = projectRoot.split('/').pop()
+            if(folderName === 'core') {
+                mvn.execute(['clean', 'install', '-PautoInstallBundle'])
+            } else {
+                mvn.execute(['clean', 'install', '-PautoInstallPackage'])
+            }
+        } else {
+            mvn.execute(['clean', 'install'])
+        }
+    }
+}
+
+if(!args.watch) {
+    console.log('compiling project')
+
+    build(process.cwd())
+} else {
+
+    let files = []
+    const compiler = function() {
+
+        if(files.length > 0 && !compiling) {
+            compiling = true
+            let processing = JSON.parse(JSON.stringify(files))
+            files = []
+            console.log('time to compile', processing)
+            // compile(processing)
+            compiling = false
+        }
+        setTimeout(function () {
+            compiler()
+        }, 5000)
+    }
+    setTimeout(function () {
+        compiler()
+    }, 5000)
+
+    const ignoreFile = fs.readFileSync('.gitignore').toString();
+    console.log(ignoreFile)
+    const gitignore = ignore()
+        .add(ignoreFile).add('.git').add('.gitignore')
+
+    watch('.', { recursive: true }, function(evt, name) {
+        console.log(name, fs.statSync(name).isDirectory())
+        if(!fs.statSync(name).isDirectory()) {
+            if(!gitignore.ignores(name)) {
+                files.push(name)
+                console.log('>>>>>>>>>>>>>>>>>', name)
+            }
+        }
+    });
 }
