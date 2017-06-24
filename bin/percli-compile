@@ -83,7 +83,7 @@ if(!args.watch) {
             let processing = JSON.parse(JSON.stringify(files))
             files = []
             console.log('time to compile', processing)
-            // compile(processing)
+            compile(processing)
             compiling = false
         }
         setTimeout(function () {
