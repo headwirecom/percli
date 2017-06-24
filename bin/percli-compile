@@ -100,12 +100,16 @@ if(!args.watch) {
         .add(ignoreFile).add('.git').add('.gitignore')
 
     watch('.', { recursive: true }, function(evt, name) {
-        console.log(name, fs.statSync(name).isDirectory())
-        if(!fs.statSync(name).isDirectory()) {
-            if(!gitignore.ignores(name)) {
-                files.push(name)
-                console.log('>>>>>>>>>>>>>>>>>', name)
+        try {
+            console.log(name, fs.statSync(name).isDirectory())
+            if(!fs.statSync(name).isDirectory()) {
+                if(!gitignore.ignores(name)) {
+                    files.push(name)
+                    console.log('>>>>>>>>>>>>>>>>>', name)
+                }
             }
+        } catch(error) {
+            console.error('failed to handle file', name, error)
         }
     });
 }
