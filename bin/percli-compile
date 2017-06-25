@@ -23,11 +23,17 @@ function findProjectRoot(folder) {
 	return findProjectRoot(parent)
 }
 
-function findCommonRoot(left, right) {
-    let relative = path.relative(left, right)
-    console.log(relative)
-    // needs fixing, find the common anchestor
-    return left
+function findCommonRoot(path1, path2) {
+
+var rel = path.relative(path1, path2)
+
+var segments = rel.split(path.sep)
+for(let i = 0; i < segments.length && segments[i] === '..'; i++) {
+
+	path2 = path.join(path2, '..')
+
+}
+	return path2
 }
 
 let compiling = false
