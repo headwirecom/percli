@@ -107,11 +107,11 @@ if(!args.watch) {
 
     watch('.', { recursive: true }, function(evt, name) {
         try {
-            console.log(name, fs.statSync(name).isDirectory())
-            if(!fs.statSync(name).isDirectory()) {
+//            console.log(evt, name, fs.statSync(name).isDirectory())
+            if(!compiling && !fs.statSync(name).isDirectory()) {
                 if(!gitignore.ignores(name)) {
                     files.push(name)
-                    console.log('>>>>>>>>>>>>>>>>>', name)
+                    console.log('>>>>>>>>>>>>>>>>>', evt, name)
                 }
             }
         } catch(error) {
