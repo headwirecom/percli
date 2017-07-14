@@ -50,7 +50,7 @@ if(!fs.existsSync('./fragments')) {
     } else {
         fs.mkdirsSync(componentPath)
 
-        fs.writeFileSync(path.join(componentPath, 'template.html')  , templates.getStubHTML())
+        fs.writeFileSync(path.join(componentPath, 'template.html')  , templates.getStubHTML(componentName))
         if(args.container) {
             fs.writeFileSync(path.join(componentPath, 'template.vue')  , templates.getStubVueContainer())
             fs.writeFileSync(path.join(componentPath, 'model.json')    , templates.getStubModelContainer(ComponentName))

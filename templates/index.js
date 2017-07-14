@@ -43,8 +43,8 @@ module.exports = {
 `
     },
 
-    getStubHTML() {
-        return `<div></div>`
+    getStubHTML(name) {
+        return `<div>${name}</div>`
     },
     getStubModelComponent(name) {
         return ``+
@@ -93,6 +93,7 @@ module.exports = {
 `module.exports = {
     convert: function($, f) {
         f.bindPath($)
+        f.addChildren($)
         f.addPlaceholders($)
     }
 }`
