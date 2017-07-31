@@ -1,16 +1,26 @@
 #!/usr/bin/env node
 
 const args = require('commander')
-const { startPeregrine }  = require('../lib/tasks')
+const { startPeregrine, setPort }  = require('../lib/tasks')
 const { peregrineBanner } = require('../lib/banner.js')
 
 args.version('1.0.0')
+    .option('-a, --author', 'start as author')
+    .option('-s, --standalone', 'start as standalone')
+    .option('-p, --publish', 'start as publish')
     .parse(process.argv)
 
-async function serverStart(){
+async function serverStart(type){
 	await peregrineBanner()
 	console.log('step 1 complete: banner displayed')
-	startPeregrine()
+	startPeregrine(type)
 }
 
-serverStart()
+if(args.author) {
+    serverStart('author')
+} else if(args.publish) {
+    setPort(8180)
+    serverStart('publish')
+} else {
+    serverStart('standalone')
+}
