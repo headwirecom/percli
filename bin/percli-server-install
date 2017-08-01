@@ -5,7 +5,8 @@ const args = require('commander')
 const { 
   startPeregrine, 
   getPackageList, 
-  installPackages 
+  installPackages,
+  setPort
 } = require('../lib/tasks')
 const { 
   peregrineBanner 
@@ -19,6 +20,8 @@ args.version('1.0.0')
   .option('-d, --download', 'only download')
   .option('-e, --existing', 'install on running server')
   .option('-i, --install',  'only install')
+  .option('-a, --author',  'install as author')
+  .option('-p, --publish',  'install as publish')
   .parse(process.argv)
 
 /* Flow Control ==========
@@ -45,6 +48,19 @@ async function serverInstall() {
 
         if(!args.existing) {
             // step 5
+
+            fs.mkdirSync('sling')
+
+            let slingproperties = ''
+            if(args.publish) {
+                slingproperties = `sling.run.modes=publish,notshared\norg.osgi.service.http.port=8180`
+                setPort(8180)
+            } else if(args.author) {
+                slingproperties = `sling.run.modes=authir,notshared\norg.osgi.service.http.port=8080`
+            }
+
+            fs.writeFileSync('sling/sling.properties', slingproperties)
+
             await startPeregrine()
             console.log('after await')
         }
