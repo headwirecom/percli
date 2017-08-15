@@ -22,8 +22,17 @@ args.version('1.0.0')
   .option('-i, --install',  'only install')
   .option('-a, --author',  'install as author')
   .option('-p, --publish',  'install as publish')
+  .option('-P, --port [port]',  'run on given port')
   .parse(process.argv)
 
+let port = 8080
+if(args.publish) {
+    port = 8180
+}
+
+if(args.port) {
+    port = args.port
+}
 /* Flow Control ==========
 ========================== */
 async function serverInstall() {
@@ -53,10 +62,11 @@ async function serverInstall() {
 
             let slingproperties = ''
             if(args.publish) {
-                slingproperties = `sling.run.modes=publish,notshared\norg.osgi.service.http.port=8180`
-                setPort(8180)
+                slingproperties = `sling.run.modes=publish,notshared\norg.osgi.service.http.port=${port}`
+                setPort(port)
             } else if(args.author) {
-                slingproperties = `sling.run.modes=authir,notshared\norg.osgi.service.http.port=8080`
+                slingproperties = `sling.run.modes=authir,notshared\norg.osgi.service.http.port=${port}`
+                setPort(port)
             }
 
             fs.writeFileSync('sling/sling.properties', slingproperties)
