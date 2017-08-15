@@ -1,0 +1,10 @@
+#!/usr/bin/env node
+
+const args = require('commander')
+const { listServers }  = require('../lib/tasks')
+const { peregrineBanner } = require('../lib/banner.js')
+
+args.version('1.0.0')
+    .parse(process.argv)
+
+listServers()

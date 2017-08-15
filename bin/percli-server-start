@@ -1,26 +1,55 @@
 #!/usr/bin/env node
 
 const args = require('commander')
-const { startPeregrine, setPort }  = require('../lib/tasks')
+const { startPeregrine, setPort, getPathForServer }  = require('../lib/tasks')
 const { peregrineBanner } = require('../lib/banner.js')
+
+const fs = require('fs')
+const path = require('path')
 
 args.version('1.0.0')
     .option('-a, --author', 'start as author')
     .option('-s, --standalone', 'start as standalone')
     .option('-p, --publish', 'start as publish')
+    .option('-n, --name [name]', 'start server by name')
     .parse(process.argv)
 
 async function serverStart(type){
 	await peregrineBanner()
-	console.log('step 1 complete: banner displayed')
 	startPeregrine(type)
 }
 
-if(args.author) {
-    serverStart('author')
-} else if(args.publish) {
-    setPort(8180)
-    serverStart('publish')
+if(args.name) {
+    const serverPath = getPathForServer(args.name)
+
+    if(serverPath) {
+        try {
+            let port = 8080
+            const file = fs.readFileSync(path.join(serverPath, 'sling', 'sling.properties')).toString()
+            lines = file.split(/[\n\r]/)
+            for(let i = 0; i < lines.length; i++) {
+                if(lines[i].startsWith('org.osgi.service.http.port=')) {
+                    const prop = lines[i].split('=')
+                    port = prop[1]
+                }
+            }
+            setPort(port)
+            process.chdir(serverPath)
+            serverStart('standalone')
+        } catch(err) {
+            console.error('server at path',serverPath,'does not exist')
+        }
+    } else {
+        console.error('no server found with name', args.name)
+    }
 } else {
-    serverStart('standalone')
+    if(args.author) {
+        serverStart('author')
+    } else if(args.publish) {
+        setPort(8180)
+        serverStart('publish')
+    } else {
+        serverStart('standalone')
+    }
 }
+

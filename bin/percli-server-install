@@ -6,7 +6,8 @@ const {
   startPeregrine, 
   getPackageList, 
   installPackages,
-  setPort
+  setPort,
+  addServer
 } = require('../lib/tasks')
 const { 
   peregrineBanner 
@@ -23,6 +24,7 @@ args.version('1.0.0')
   .option('-a, --author',  'install as author')
   .option('-p, --publish',  'install as publish')
   .option('-P, --port [port]',  'run on given port')
+  .option('-n, --name [name]',  'register server with given name')
   .parse(process.argv)
 
 let port = 8080
@@ -53,26 +55,30 @@ async function serverInstall() {
         await downloadFiles(packagesList)
     }
 
+    setPort(port)
     if(!args.download) {
 
         if(!args.existing) {
+            let name = 'default-'+port
             // step 5
 
             fs.mkdirSync('sling')
 
             let slingproperties = ''
             if(args.publish) {
+                name = 'publish-'+port
                 slingproperties = `sling.run.modes=publish,notshared\norg.osgi.service.http.port=${port}`
-                setPort(port)
             } else if(args.author) {
+                name = 'author-'+port
                 slingproperties = `sling.run.modes=authir,notshared\norg.osgi.service.http.port=${port}`
-                setPort(port)
+            } else {
+                slingproperties = `org.osgi.service.http.port=${port}`
             }
 
             fs.writeFileSync('sling/sling.properties', slingproperties)
 
             await startPeregrine()
-            console.log('after await')
+            addServer(args.name ? args.name : name, process.cwd())
         }
 
         // step 2
