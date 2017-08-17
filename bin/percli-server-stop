@@ -1,22 +1,19 @@
 #!/usr/bin/env node
 
 const args = require('commander')
-const { startPeregrine, setPort, getPathForServer }  = require('../lib/tasks')
+const { stopPeregrine, setPort, getPathForServer }  = require('../lib/tasks')
 const { peregrineBanner } = require('../lib/banner.js')
 
 const fs = require('fs')
 const path = require('path')
 
 args.version('1.0.0')
-    .option('-a, --author', 'start as author')
-    .option('-s, --standalone', 'start as standalone')
-    .option('-p, --publish', 'start as publish')
     .option('-n, --name [name]', 'start server by name')
     .parse(process.argv)
 
-async function serverStart(type){
+async function serverStop(type){
 	await peregrineBanner()
-	startPeregrine(type)
+	stopPeregrine()
 }
 
 if(typeof args.name === 'string') {
@@ -35,21 +32,15 @@ if(typeof args.name === 'string') {
             }
             setPort(port)
             process.chdir(serverPath)
-            serverStart('standalone')
+            serverStop()
         } catch(err) {
             console.error('server at path',serverPath,'does not exist')
         }
     } else {
         console.error('no server found with name', args.name)
     }
-} else {
-    if(args.author) {
-        serverStart('author')
-    } else if(args.publish) {
-        setPort(8180)
-        serverStart('publish')
-    } else {
-        serverStart('standalone')
-    }
+}
+else {
+    serverStop()
 }
 

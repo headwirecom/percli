@@ -6,6 +6,7 @@ var asciify = require('asciify')
 args.version('1.0.0')
 	.command('install', 'install peregrine')
 	.command('start', 'start peregrine')
+	.command('stop', 'stop peregrine')
 	.command('list', 'list all peregrine servers')
 	.parse(process.argv)
 
