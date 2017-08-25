@@ -19,7 +19,7 @@ const mvn = maven.create()
 const percli = fileUrl(path.join(__dirname, '..'))
 
 mvn.execute(['archetype:generate', '--settings', path.join(__dirname, '..', 'maven', 'settings.xml')], {
-    archetypeGroupId: "com.peregrine",
+    archetypeGroupId: "com.peregrine-cms",
     archetypeArtifactId: "peregrine-project-archetype",
     groupId:"com."+projectName,
     artifactId: projectName,
