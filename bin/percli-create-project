@@ -23,7 +23,7 @@ mvn.execute(['archetype:generate', '--settings', path.join(__dirname, '..', 'mav
     archetypeArtifactId: "peregrine-project-archetype",
     groupId:"com."+projectName,
     artifactId: projectName,
-    version:"1.0.0-SNAPSHOT",
+    version:"1.0-SNAPSHOT",
     appsFolderName: projectName,
     artifactName: projectName,
     contentFolderName: projectName,
