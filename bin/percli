@@ -10,6 +10,7 @@ if(semver.satisfies(semver.clean(process.version), '>=7.10.0')) {
         .command('create', 'dev tasks')
         .command('compile', 'compile tasks')
         .command('htmltovue', 'convert html to vue using htmltovue.js in the fragments folder')
+        .command('hatch', 'convert html to vue using htmltovue.js in the fragments folder')
         .parse(process.argv)
 }
 else {
