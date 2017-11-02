@@ -40,4 +40,7 @@ public class {{ modelName }}Model extends {{ classNameParent }} {
     //GEN[:GETTERS
     //GEN]
 
+    //GEN[:CUSTOMGETTERS
+    //GEN]
+
 }
