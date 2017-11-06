@@ -1,0 +1,77 @@
+#!/usr/bin/env node
+
+const args  = require('commander')
+const maven = require('maven')
+const fs    = require('fs-extra')
+const path  = require('path')
+
+const templates = require('../templates/index.js')
+const generator = require('../lib/generator.js')
+const functions = require('../lib/functions.js')
+
+args.version('1.0.0')
+	.usage('[options] <objectName>')
+    .option('-c, --container', 'object is a container (may contain other objects)')
+    .option('-f, --force', 'force creation (deletes current stub)')
+	.parse(process.argv)
+
+if(args.args.length < 1) {
+    args.help()
+}
+
+const objectName = args.args[0].toLowerCase()
+const ObjectName = objectName.charAt(0).toUpperCase() + objectName.slice(1)
+
+const settings = JSON.parse(fs.readFileSync('./.properties/settings.json').toString())
+
+const projectName = settings.appname
+
+let templatePath = templates.getPath()
+let projectPath = process.cwd()
+// should check that we are in the root of the project
+// console.log('template  path:',templatePath)
+// console.log('project   path:',projectPath)
+
+let objectPath = path.join(projectPath, './objects/'+objectName)
+let uiAppsObjectPath = path.join(projectPath, './ui.apps/src/main/content/jcr_root/apps/', projectName, 'objects', objectName)
+let coreModelsPath = path.join(projectPath, './core/src/main/java/com', projectName, 'models')
+
+if(!fs.existsSync('./objects')) {
+
+    console.error()
+    console.error('[ERROR] refusing to create object stub - make sure the fragments directory exists')
+
+} else {
+    if(!args.force && fs.existsSync(objectPath)) {
+        console.error()
+        console.error('[ERROR] refusing to create object stub - stub already exists, use -f to force')
+    } else {
+        fs.mkdirsSync(objectPath)
+
+        if(args.container) {
+            fs.writeFileSync(path.join(objectPath, 'model.json')    , templates.getStubModelContainer(ObjectName))
+            fs.writeFileSync(path.join(objectPath, 'htmltovue.js')  , templates.getStubHtmlToVueContainer())
+        } else {
+            fs.writeFileSync(path.join(objectPath, 'model.json')    , templates.getStubModelComponent(ObjectName))
+            fs.writeFileSync(path.join(objectPath, 'htmltovue.js')  , templates.getStubHtmlToVueContainer())
+        }
+
+        // make .content.xml file for object
+        fs.mkdirsSync(uiAppsObjectPath)
+        fs.writeFileSync(path.join(uiAppsObjectPath, '.content.xml')  , templates.getStubContentXML(objectName))
+
+        const def = JSON.parse(fs.readFileSync(path.join(objectPath, 'model.json')).toString())
+        // make dialog.json for object
+        fs.writeFileSync(path.join(uiAppsObjectPath, 'dialog.json'), JSON.stringify(functions.createDialog(def.definitions[ObjectName], true, 2)))
+
+        // make model for object
+        fs.mkdirsSync(coreModelsPath)
+        def.name = ObjectName
+        def.componentPath = projectName + '/objects/' + objectName
+        def.package = 'com.'+projectName+'.models'
+        def.modelName = ObjectName
+        def.classNameParent = 'AbstractComponent'
+        if(args.container) def.classNameParent = 'Container'
+        generator.generate(path.join(templates.getPath(),'model.java.template.java'), path.join(coreModelsPath, ObjectName + 'Model.java'), def)
+    }
+}

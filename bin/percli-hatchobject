@@ -1,0 +1,19 @@
+#!/usr/bin/env node
+
+const args  = require('commander')
+
+const gen = require('../lib/htmltovue.js')
+
+args.version('1.0.0')
+	.usage('[options] <componentName>')
+	.parse(process.argv)
+
+if(args.args.length < 1) {
+    args.help()
+}
+
+console.log(args.args[0])
+gen.htmltovue(args.args[0], args.container, false, false, true, true, false, 'objects')
+
+
+
