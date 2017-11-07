@@ -39,7 +39,7 @@ let coreModelsPath = path.join(projectPath, './core/src/main/java/com', projectN
 if(!fs.existsSync('./objects')) {
 
     console.error()
-    console.error('[ERROR] refusing to create object stub - make sure the fragments directory exists')
+    console.error('[ERROR] refusing to create object stub - make sure the object directory exists')
 
 } else {
     if(!args.force && fs.existsSync(objectPath)) {
@@ -50,15 +50,13 @@ if(!fs.existsSync('./objects')) {
 
         if(args.container) {
             fs.writeFileSync(path.join(objectPath, 'model.json')    , templates.getStubModelContainer(ObjectName))
-            fs.writeFileSync(path.join(objectPath, 'htmltovue.js')  , templates.getStubHtmlToVueContainer())
         } else {
             fs.writeFileSync(path.join(objectPath, 'model.json')    , templates.getStubModelComponent(ObjectName))
-            fs.writeFileSync(path.join(objectPath, 'htmltovue.js')  , templates.getStubHtmlToVueContainer())
         }
 
         // make .content.xml file for object
         fs.mkdirsSync(uiAppsObjectPath)
-        fs.writeFileSync(path.join(uiAppsObjectPath, '.content.xml')  , templates.getStubContentXML(objectName))
+        fs.writeFileSync(path.join(uiAppsObjectPath, '.content.xml')  , templates.getStubObjectContentXML(objectName))
 
         const def = JSON.parse(fs.readFileSync(path.join(objectPath, 'model.json')).toString())
         // make dialog.json for object
