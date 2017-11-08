@@ -115,6 +115,17 @@ module.exports = {
         f.bindPath($)
     }
 }`
-    }
+    },
+
+    getStubSampleContainer(name) {
+        return ``+
+`{
+  "title": "Test1",
+  "group": "",
+  "model": {
+    "text": "example"
+  }
+}`
+    },
 
 }
