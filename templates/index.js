@@ -120,8 +120,9 @@ module.exports = {
     getStubSampleContainer(name) {
         return ``+
 `{
-  "title": "Test1",
+  "title": "${name}",
   "group": "",
+  "default": true,
   "model": {
     "text": "example"
   }
