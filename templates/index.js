@@ -122,7 +122,6 @@ module.exports = {
 `{
   "title": "${name}",
   "group": "",
-  "default": true,
   "model": {
     "text": "example"
   }
