@@ -9,6 +9,7 @@ args.version('1.0.0')
     .option('-d, --deploy', 'deploy to server (note, if the model.json file has been changed a full build is necessary)')
 	.option('-f, --dialog', 'only convert the dialog')
 	.option('-m, --model', 'only convert the model')
+	.option('-n, --nosampleempty', 'do not include the sample-empty.json')
 	.option('-v, --vue', 'only convert the template.vue')
 	.usage('[options] <componentName>')
 	.parse(process.argv)
@@ -20,9 +21,9 @@ if(args.args.length < 1) {
 
 console.log(args.args[0])
 if(args.args[0] === '*') {
-    gen.htmltovueAll(args.container, args.compile, args.deploy, args.dialog, args.model, args.vue)
+    gen.htmltovueAll(args.container, args.compile, args.deploy, args.dialog, args.model, args.nosampleempty, args.vue)
 } else {
-    gen.htmltovue(args.args[0], args.container, args.compile, args.deploy, args.dialog, args.model, args.vue)
+    gen.htmltovue(args.args[0], args.container, args.compile, args.deploy, args.dialog, args.model, args.nosampleempty, args.vue)
 }
 
 

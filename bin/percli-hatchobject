@@ -14,9 +14,9 @@ if(args.args.length < 1) {
 
 console.log(args.args[0])
 if(args.args[0] === '*') {
-    gen.htmltovueAll(args.container, false, false, true, true, false, 'objects')
+    gen.htmltovueAll(args.container, false, false, true, true, false, false, 'objects')
 } else {
-    gen.htmltovue(args.args[0], args.container, false, false, true, true, false, 'objects')
+    gen.htmltovue(args.args[0], args.container, false, false, true, true, false, false, 'objects')
 }
 
 
