@@ -10,10 +10,9 @@ args.version('1.0.0')
 	.option('-f, --dialog', 'only convert the dialog')
 	.option('-m, --model', 'only convert the model')
 	.option('-v, --vue', 'only convert the template.vue')
-	.option('-n, --nosampleempty', 'do not include the sample-empty.json')
+	.option('-e, --sampleempty', 'will include the sample-empty.json, if exists')
 	.usage('[options] <componentName>')
 	.parse(process.argv)
-
 
 if(args.args.length < 1) {
     args.help()
@@ -21,10 +20,7 @@ if(args.args.length < 1) {
 
 console.log(args.args[0])
 if(args.args[0] === '*') {
-    gen.htmltovueAll(args.container, args.compile, args.deploy, args.dialog, args.model, args.vue, args.nosampleempty)
+    gen.htmltovueAll(args.container, args.compile, args.deploy, args.dialog, args.model, args.vue, args.sampleempty)
 } else {
-    gen.htmltovue(args.args[0], args.container, args.compile, args.deploy, args.dialog, args.model, args.vue, args.nosampleempty)
+    gen.htmltovue(args.args[0], args.container, args.compile, args.deploy, args.dialog, args.model, args.vue, args.sampleempty)
 }
-
-
-
