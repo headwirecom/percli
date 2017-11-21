@@ -7,7 +7,8 @@ const {
   getPackageList, 
   installPackages,
   setPort,
-  addServer
+  addServer,
+  getPathForServer
 } = require('../lib/tasks')
 const { 
   peregrineBanner 
@@ -38,6 +39,16 @@ if(args.port) {
 /* Flow Control ==========
 ========================== */
 async function serverInstall() {
+  if (args.name) {
+    let serverName = args.name
+    if (!getPathForServer(serverName)) {
+        addServer(serverName, process.cwd())
+        console.log('Registering server '+serverName+' to path: '+process.cwd())
+    } else {
+        process.chdir(getPathForServer(args.name))
+        console.log('Found server '+serverName+'. Changing path to: '+process.cwd())
+    }
+  }
   fs.mkdirsSync('out')
   try {
     // step 1
@@ -78,7 +89,6 @@ async function serverInstall() {
             fs.writeFileSync('sling/sling.properties', slingproperties)
 
             await startPeregrine()
-            addServer(args.name ? args.name : name, process.cwd())
         }
 
         // step 2

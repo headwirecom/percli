@@ -1,9 +1,8 @@
 #!/usr/bin/env node
 
 const args = require('commander')
-const { startPeregrine, setPort, getPathForServer }  = require('../lib/tasks')
+const { startPeregrine, setPort, getPathForServer, addServer, pathRegistered, promptAddServer }  = require('../lib/tasks')
 const { peregrineBanner } = require('../lib/banner.js')
-
 const fs = require('fs')
 const path = require('path')
 
@@ -19,9 +18,22 @@ async function serverStart(type){
 	startPeregrine(type)
 }
 
+async function runPromptAndStart(type) {
+    await peregrineBanner()
+	const inputName = await promptAddServer(process.cwd())
+	startPeregrine(type)
+    if (!getPathForServer(inputName)) {
+        addServer(inputName, process.cwd())
+        console.log('Registering server '+inputName+' to path: '+process.cwd())
+    }
+}
 if(typeof args.name === 'string') {
+    const serverName = args.name
+    if (!getPathForServer(serverName)) {
+        addServer(serverName, process.cwd())
+        console.log('Registering server '+serverName+' to path: '+process.cwd())
+    }
     const serverPath = getPathForServer(args.name)
-
     if(serverPath) {
         try {
             let port = 8080
@@ -42,7 +54,7 @@ if(typeof args.name === 'string') {
     } else {
         console.error('no server found with name', args.name)
     }
-} else {
+} else if (pathRegistered(process.cwd())) {
     if(args.author) {
         serverStart('author')
     } else if(args.publish) {
@@ -51,5 +63,14 @@ if(typeof args.name === 'string') {
     } else {
         serverStart('standalone')
     }
-}
+} else {
 
+    if(args.author) {
+        runPromptAndStart('author')
+    } else if(args.publish) {
+        setPort(8180)
+        runPromptAndStart('publish')
+    } else {
+        runPromptAndStart('standalone')
+    }
+}
