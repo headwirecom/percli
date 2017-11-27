@@ -1,0 +1,45 @@
+#!/usr/bin/env node
+
+const fs   = require('fs-extra')
+const args = require('commander')
+const { 
+  startPeregrine, 
+  getPackageList, 
+  installPackages,
+  setPort,
+  addServer,
+  getPathForServer
+} = require('../lib/tasks')
+const { 
+  peregrineBanner 
+} = require('../lib/banner')
+const { 
+  downloadFile, 
+  downloadFiles 
+} = require('../lib/fetch')
+
+args.version('1.0.0')
+  .usage('[options] <componentName>')
+  .parse(process.argv)
+
+/* Flow Control ==========
+========================== */
+async function serverRegister() {
+  fs.mkdirsSync('out')
+  try {
+    // step 1
+    await peregrineBanner()
+        const serverName = args.args[0]
+        if (!getPathForServer(serverName)) {
+            addServer(serverName, process.cwd())
+            console.log('Registering server '+serverName+' to path: '+process.cwd())
+        } else {
+            console.log('Server name '+serverName+' already exists at this path')
+        }
+  } catch (err) {
+    console.error('serverInstall err')
+    console.error(err)
+  }
+}
+
+serverRegister()
