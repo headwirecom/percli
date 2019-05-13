@@ -10,18 +10,19 @@ args.version('1.0.0')
     .option('-a, --author', 'start as author')
     .option('-s, --standalone', 'start as standalone')
     .option('-p, --publish', 'start as publish')
+    .option('-d, --debug', 'start with debugging enabled (default port=30303)')
     .option('-n, --name [name]', 'start server by name')
     .parse(process.argv)
 
 async function serverStart(type){
 	await peregrineBanner()
-	startPeregrine(type)
+	startPeregrine(type, args.debug)
 }
 
 async function runPromptAndStart(type) {
     await peregrineBanner()
 	const inputName = await promptAddServer(process.cwd())
-	startPeregrine(type)
+	startPeregrine(type, args.debug)
     if (!getPathForServer(inputName)) {
         addServer(inputName, process.cwd())
         console.log('Registering server '+inputName+' to path: '+process.cwd())
