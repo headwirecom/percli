@@ -8,7 +8,8 @@ const {
   installPackages,
   setPort,
   addServer,
-  getPathForServer
+  getPathForServer,
+  wait
 } = require('../lib/tasks')
 const { 
   peregrineBanner 
@@ -89,6 +90,8 @@ async function serverInstall() {
             fs.writeFileSync('sling/sling.properties', slingproperties)
 
             await startPeregrine()
+            await wait(1000)
+
         }
 
         // step 2
