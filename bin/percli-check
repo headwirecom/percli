@@ -1,0 +1,15 @@
+#!/usr/bin/env node
+
+const args    = require('commander')
+const checkAvailable = require('../lib/available.js')
+
+args.version('1.0.0')
+    .usage('<technology>')
+	.parse(process.argv)
+
+checkAvailable(args.args, function(success, tech) {
+    if(!success) {
+        console.error('#ERROR# not all checks passed');
+    } 
+    process.exit(success ? 0 : -1);
+});
