@@ -15,19 +15,28 @@ args.version('1.0.0')
     .parse(process.argv)
 
 async function serverStart(type){
-	await peregrineBanner()
-	startPeregrine(type, args.debug)
+    await peregrineBanner()
+    try {
+        await startPeregrine(type, args.debug)
+    } catch(error) {
+        console.error(error);
+    }
 }
 
 async function runPromptAndStart(type) {
     await peregrineBanner()
-	const inputName = await promptAddServer(process.cwd())
-	startPeregrine(type, args.debug)
-    if (!getPathForServer(inputName)) {
-        addServer(inputName, process.cwd())
-        console.log('Registering server '+inputName+' to path: '+process.cwd())
-    }
+    const inputName = await promptAddServer(process.cwd())
+    try {
+        await startPeregrine(type, args.debug)
+        if (!getPathForServer(inputName)) {
+            addServer(inputName, process.cwd())
+            console.log('Registering server '+inputName+' to path: '+process.cwd())
+        }
+    } catch(error) {
+        console.error(error);
+    } 
 }
+
 if(typeof args.name === 'string') {
     const serverName = args.name
     if (!getPathForServer(serverName)) {
