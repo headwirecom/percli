@@ -20,22 +20,22 @@ if(projectName.match(/^[a-z][a-z0-9]*$/)) {
 
     const percli = fileUrl(path.join(__dirname, '..'))
     
-    // mvn.execute(['archetype:generate', '--settings', path.join(__dirname, '..', 'maven', 'settings.xml')], {
-    //     archetypeGroupId: "com.peregrine-cms",
-    //     archetypeArtifactId: "peregrine-project-archetype",
-    //     groupId:"com."+projectName,
-    //     artifactId: projectName,
-    //     version:"1.0-SNAPSHOT",
-    //     appsFolderName: projectName,
-    //     artifactName: projectName,
-    //     contentFolderName: projectName,
-    //     packageGroup: projectName,
-    //     slingHostName:"localhost",
-    //     slingModelSubPackage:"models",
-    //     slingPort:"8080",
-    //     interactiveMode:"false",
-    //     percli: percli
-    // })    
+    mvn.execute(['archetype:generate', '--settings', path.join(__dirname, '..', 'maven', 'settings.xml')], {
+        archetypeGroupId: "com.peregrine-cms",
+        archetypeArtifactId: "peregrine-project-archetype",
+        groupId:"com."+projectName,
+        artifactId: projectName,
+        version:"1.0-SNAPSHOT",
+        appsFolderName: projectName,
+        artifactName: projectName,
+        contentFolderName: projectName,
+        packageGroup: projectName,
+        slingHostName:"localhost",
+        slingModelSubPackage:"models",
+        slingPort:"8080",
+        interactiveMode:"false",
+        percli: percli
+    })    
 } else {
     console.error('ABORT: project names are limited to [a-z][a-z0-9]*, please try again with a vaild project name')
 }
