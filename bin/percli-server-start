@@ -34,7 +34,7 @@ async function runPromptAndStart(type) {
         }
     } catch(error) {
         console.error(error);
-    } 
+    }
 }
 
 if(typeof args.name === 'string') {
@@ -46,15 +46,7 @@ if(typeof args.name === 'string') {
     const serverPath = getPathForServer(args.name)
     if(serverPath) {
         try {
-            let port = 8080
-            const file = fs.readFileSync(path.join(serverPath, 'sling', 'sling.properties')).toString()
-            lines = file.split(/[\n\r]/)
-            for(let i = 0; i < lines.length; i++) {
-                if(lines[i].startsWith('org.osgi.service.http.port=')) {
-                    const prop = lines[i].split('=')
-                    port = prop[1]
-                }
-            }
+            let port = getSlingPort(path.join(serverPath, 'sling', 'sling.properties'))
             setPort(port)
             process.chdir(serverPath)
             serverStart('standalone')
@@ -71,6 +63,8 @@ if(typeof args.name === 'string') {
         setPort(8180)
         serverStart('publish')
     } else {
+        let port = getSlingPort(path.join('sling', 'sling.properties'))
+        setPort(port)
         serverStart('standalone')
     }
 } else {
@@ -83,4 +77,17 @@ if(typeof args.name === 'string') {
     } else {
         runPromptAndStart('standalone')
     }
+}
+
+function getSlingPort(slingPropertiesPath) {
+  let port = 8080
+  const file = fs.readFileSync(slingPropertiesPath).toString()
+  lines = file.split(/[\n\r]/)
+  for(let i = 0; i < lines.length; i++) {
+      if(lines[i].startsWith('org.osgi.service.http.port=')) {
+          const prop = lines[i].split('=')
+          port = prop[1]
+      }
+  }
+  return port
 }
