@@ -81,13 +81,17 @@ if(typeof args.name === 'string') {
 
 function getSlingPort(slingPropertiesPath) {
   let port = 8080
-  const file = fs.readFileSync(slingPropertiesPath).toString()
-  lines = file.split(/[\n\r]/)
-  for(let i = 0; i < lines.length; i++) {
-      if(lines[i].startsWith('org.osgi.service.http.port=')) {
-          const prop = lines[i].split('=')
-          port = prop[1]
+  try {
+      const file = fs.readFileSync(slingPropertiesPath).toString()
+      lines = file.split(/[\n\r]/)
+      for(let i = 0; i < lines.length; i++) {
+          if(lines[i].startsWith('org.osgi.service.http.port=')) {
+              const prop = lines[i].split('=')
+              port = prop[1]
+          }
       }
+  }  catch(err) {
+      console.error('Unable to fetch the sling.properties file, thus using the default port as 8080')
   }
   return port
 }
