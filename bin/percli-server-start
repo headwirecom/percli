@@ -91,7 +91,7 @@ function getSlingPort(slingPropertiesPath) {
           }
       }
   } catch(err) {
-      console.error('Unable to fetch the sling.properties file, thus using the default port as 8080')
+      console.log('Unable to fetch the sling.properties file, thus using the default port as 8080')
   }
   return port
 }
