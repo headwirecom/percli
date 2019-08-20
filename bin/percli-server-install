@@ -8,7 +8,8 @@ const {
   installPackages,
   setPort,
   addServer,
-  getPathForServer
+  getPathForServer,
+  wait
 } = require('../lib/tasks')
 const { 
   peregrineBanner 
@@ -21,6 +22,7 @@ const {
 args.version('1.0.0')
   .option('-d, --download', 'only download')
   .option('-e, --existing', 'install on running server')
+  .option('-s, --sling [version]',  'force sling version')
   .option('-i, --install',  'only install')
   .option('-a, --author',  'install as author')
   .option('-p, --publish',  'install as publish')
@@ -36,6 +38,17 @@ if(args.publish) {
 if(args.port) {
     port = args.port
 }
+
+let sling = 9;
+if(args.sling) {
+  if(args.sling === '9' || args.sling === '11') {
+    sling = parseInt(args.sling);
+  } else {
+    console.log('only sling-9 and sling-11 are supported at this time - for other versions please log an enhancements request')
+    process.exit(-1);
+  }
+}
+
 /* Flow Control ==========
 ========================== */
 async function serverInstall() {
@@ -57,13 +70,13 @@ async function serverInstall() {
     if(!args.install) {
 
         // step 2
-        var packagesList = await getPackageList()
+        var packagesList = await getPackageList(sling)
 
         //step 3
-        await downloadFile('https://vagrant.headwire.com/sling/9/org.apache.sling.launchpad-9.jar', 'sling-9.jar')
+        await downloadFile(`https://vagrant.headwire.com/sling/9/org.apache.sling.launchpad-${sling}.jar`, `sling-${sling}.jar`)
 
         // step 4
-        await downloadFiles(packagesList)
+        await downloadFiles(packagesList, sling)
     }
 
     setPort(port)
@@ -89,6 +102,8 @@ async function serverInstall() {
             fs.writeFileSync('sling/sling.properties', slingproperties)
 
             await startPeregrine()
+            await wait(1000)
+
         }
 
         // step 2

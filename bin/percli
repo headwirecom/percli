@@ -6,6 +6,7 @@ var semver = require('semver')
 if(semver.satisfies(semver.clean(process.version), '>=7.10.0')) {
     args.version('1.0.0')
         .usage('<command> [options]')
+        .command('check', 'hepful checks')
         .command('server', 'server specific commands')
         .command('create', 'dev tasks')
         .command('compile', 'compile tasks')

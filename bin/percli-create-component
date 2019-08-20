@@ -20,68 +20,76 @@ if(args.args.length < 1) {
 }
 
 const componentName = args.args[0].toLowerCase()
-const ComponentName = componentName.charAt(0).toUpperCase() + componentName.slice(1)
 
-const settings = JSON.parse(fs.readFileSync('./.properties/settings.json').toString())
+if(!componentName.match(/^[a-z][a-z0-9]*$/)) {
 
-const projectName = settings.appname
-
-let templatePath = templates.getPath()
-let projectPath = process.cwd()
-// should check that we are in the root of the project
-// console.log('template  path:',templatePath)
-// console.log('project   path:',projectPath)
-
-let componentPath = path.join(projectPath, './fragments/'+componentName)
-// console.log('component path:',componentPath)
-
-let uiAppsComponentPath = path.join(projectPath, './ui.apps/src/main/content/jcr_root/apps/', projectName, 'components', componentName)
-let coreModelsPath = path.join(projectPath, './core/src/main/java/com', projectName, 'models')
-
-if(!fs.existsSync('./fragments')) {
-
-    console.error()
-    console.error('[ERROR] refusing to create component stub - make sure the fragments directory exists')
+    console.error('ABORT: compnent names are limited to [a-z][a-z0-9]*, please try again with a vaild component name')
 
 } else {
-    if(!args.force && fs.existsSync(componentPath)) {
+
+    const ComponentName = componentName.charAt(0).toUpperCase() + componentName.slice(1)
+
+    const settings = JSON.parse(fs.readFileSync('./.properties/settings.json').toString())
+
+    const projectName = settings.appname
+
+    let templatePath = templates.getPath()
+    let projectPath = process.cwd()
+    // should check that we are in the root of the project
+    // console.log('template  path:',templatePath)
+    // console.log('project   path:',projectPath)
+
+    let componentPath = path.join(projectPath, './fragments/'+componentName)
+    // console.log('component path:',componentPath)
+
+    let uiAppsComponentPath = path.join(projectPath, './ui.apps/src/main/content/jcr_root/apps/', projectName, 'components', componentName)
+    let coreModelsPath = path.join(projectPath, './core/src/main/java/com', projectName, 'models')
+
+    if(!fs.existsSync('./fragments')) {
+
         console.error()
-        console.error('[ERROR] refusing to create component stub - stub already exists, use -f to force')
+        console.error('[ERROR] refusing to create component stub - make sure the fragments directory exists')
+
     } else {
-        fs.mkdirsSync(componentPath)
-
-        fs.writeFileSync(path.join(componentPath, 'template.html')  , templates.getStubHTML(componentName))
-        if(args.container) {
-            fs.writeFileSync(path.join(componentPath, 'template.vue')  , templates.getStubVueContainer())
-            fs.writeFileSync(path.join(componentPath, 'model.json')    , templates.getStubModelContainer(ComponentName))
-            fs.writeFileSync(path.join(componentPath, 'htmltovue.js')  , templates.getStubHtmlToVueContainer())
-            fs.writeFileSync(path.join(componentPath, 'sample.json')    , templates.getStubSampleContainer(ComponentName))
+        if(!args.force && fs.existsSync(componentPath)) {
+            console.error()
+            console.error('[ERROR] refusing to create component stub - stub already exists, use -f to force')
         } else {
-            fs.writeFileSync(path.join(componentPath, 'template.vue')  , templates.getStubVueComponent())
-            fs.writeFileSync(path.join(componentPath, 'model.json')    , templates.getStubModelComponent(ComponentName))
-            fs.writeFileSync(path.join(componentPath, 'htmltovue.js')  , templates.getStubHtmlToVueComponent())
-            fs.writeFileSync(path.join(componentPath, 'sample.json')    , templates.getStubSampleContainer(ComponentName))
+            fs.mkdirsSync(componentPath)
+
+            fs.writeFileSync(path.join(componentPath, 'template.html')  , templates.getStubHTML(componentName))
+            if(args.container) {
+                fs.writeFileSync(path.join(componentPath, 'template.vue')  , templates.getStubVueContainer())
+                fs.writeFileSync(path.join(componentPath, 'model.json')    , templates.getStubModelContainer(ComponentName))
+                fs.writeFileSync(path.join(componentPath, 'hatch.js')  , templates.getStubHtmlToVueContainer())
+                fs.writeFileSync(path.join(componentPath, 'sample.json')    , templates.getStubSampleContainer(ComponentName))
+            } else {
+                fs.writeFileSync(path.join(componentPath, 'template.vue')  , templates.getStubVueComponent())
+                fs.writeFileSync(path.join(componentPath, 'model.json')    , templates.getStubModelComponent(ComponentName))
+                fs.writeFileSync(path.join(componentPath, 'hatch.js')  , templates.getStubHtmlToVueComponent())
+                fs.writeFileSync(path.join(componentPath, 'sample.json')    , templates.getStubSampleContainer(ComponentName))
+            }
+
+            // make .content.xml file for component
+            fs.mkdirsSync(uiAppsComponentPath)
+            fs.writeFileSync(path.join(uiAppsComponentPath, '.content.xml')  , templates.getStubContentXML(componentName))
+
+            // copy template.vue file to component
+            fs.writeFileSync(path.join(uiAppsComponentPath, 'template.vue')  , fs.readFileSync(path.join(componentPath, 'template.vue')).toString())
+
+            const def = JSON.parse(fs.readFileSync(path.join(componentPath, 'model.json')).toString())
+            // make dialog.json for component
+            fs.writeFileSync(path.join(uiAppsComponentPath, 'dialog.json'), JSON.stringify(functions.createDialog(def.definitions[ComponentName], true, 2)))
+
+            // make model for component
+            fs.mkdirsSync(coreModelsPath)
+            def.name = ComponentName
+            def.componentPath = projectName + '/components/' + componentName
+            def.package = 'com.'+projectName+'.models'
+            def.modelName = ComponentName
+            def.classNameParent = 'AbstractComponent'
+            if(args.container) def.classNameParent = 'Container'
+            generator.generate(path.join(templates.getPath(),'model.java.template.java'), path.join(coreModelsPath, ComponentName + 'Model.java'), def)
         }
-
-        // make .content.xml file for component
-        fs.mkdirsSync(uiAppsComponentPath)
-        fs.writeFileSync(path.join(uiAppsComponentPath, '.content.xml')  , templates.getStubContentXML(componentName))
-
-        // copy template.vue file to component
-        fs.writeFileSync(path.join(uiAppsComponentPath, 'template.vue')  , fs.readFileSync(path.join(componentPath, 'template.vue')).toString())
-
-        const def = JSON.parse(fs.readFileSync(path.join(componentPath, 'model.json')).toString())
-        // make dialog.json for component
-        fs.writeFileSync(path.join(uiAppsComponentPath, 'dialog.json'), JSON.stringify(functions.createDialog(def.definitions[ComponentName], true, 2)))
-
-        // make model for component
-        fs.mkdirsSync(coreModelsPath)
-        def.name = ComponentName
-        def.componentPath = projectName + '/components/' + componentName
-        def.package = 'com.'+projectName+'.models'
-        def.modelName = ComponentName
-        def.classNameParent = 'AbstractComponent'
-        if(args.container) def.classNameParent = 'Container'
-        generator.generate(path.join(templates.getPath(),'model.java.template.java'), path.join(coreModelsPath, ComponentName + 'Model.java'), def)
     }
 }
