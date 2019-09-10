@@ -13,6 +13,24 @@ args.version('1.0.0')
     .option('-d, --deploy', 'deploy to server')
 	.parse(process.argv)
 
+/*
+The prepareParamObject function will prepare the parameters object that
+will be consumed by mvn.execute e.g. mvn.execute(commands, parameters);
+
+Sample command to pass parameters in compile task
+percli compile -d sling.port=8445 sling.username=mainadmin
+*/
+var parameters = {};
+prepareParamObject();
+
+function prepareParamObject() {
+  Object.entries(args.args).forEach(entry => {
+    let value = entry[1];
+    var splitParameter = value.split("=");
+    parameters[splitParameter[0]] = splitParameter[1]
+  });
+}
+
 function findProjectRoot(folder) {
 	const pom = folder + '/pom.xml'
 	if(fs.existsSync(pom)) {
@@ -65,12 +83,12 @@ function build(dir) {
         if(args.deploy) {
             const folderName = projectRoot.split('/').pop()
             if(folderName === 'core') {
-                mvn.execute(['clean', 'install', '-PautoInstallBundle'])
+                mvn.execute(['clean', 'install', '-PautoInstallBundle'], parameters)
             } else {
-                mvn.execute(['clean', 'install', '-PautoInstallPackage'])
+                mvn.execute(['clean', 'install', '-PautoInstallPackage'], parameters)
             }
         } else {
-            mvn.execute(['clean', 'install'])
+            mvn.execute(['clean', 'install'], parameters)
         }
     }
 }
