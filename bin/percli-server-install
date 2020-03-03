@@ -94,7 +94,7 @@ async function serverInstall() {
                 slingproperties = `sling.run.modes=publish,notshared\norg.osgi.service.http.port=${port}`
             } else if(args.author) {
                 name = 'author-'+port
-                slingproperties = `sling.run.modes=authir,notshared\norg.osgi.service.http.port=${port}`
+                slingproperties = `sling.run.modes=author,notshared\norg.osgi.service.http.port=${port}`
             } else {
                 slingproperties = `org.osgi.service.http.port=${port}`
             }
@@ -110,7 +110,7 @@ async function serverInstall() {
         var packagesList = await getPackageList()
 
         // step 6
-        await installPackages(packagesList)
+        await installPackages(packagesList, port)
     }
 
   } catch (err) {
