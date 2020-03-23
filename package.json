@@ -1,6 +1,6 @@
 {
   "name": "percli",
-  "version": "0.1.35-alpha",
+  "version": "0.1.36-alpha",
   "description": "peregrine-cms cli tool",
   "main": "/bin/percli",
   "keywords": [
