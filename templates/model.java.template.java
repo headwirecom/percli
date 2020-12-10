@@ -13,6 +13,8 @@ import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+{{ imports }}
+
 /*
     //GEN[:DATA
     //GEN]
@@ -32,7 +34,7 @@ import javax.inject.Named;
 //GEN]
 public class {{ modelName }}Model extends {{ classNameParent }} {
 
-    public {{ modelName }}Model(Resource r) { super(r); }
+    public {{ modelName }}Model(final Resource r) { super(r); }
 
     //GEN[:INJECT
     //GEN]
