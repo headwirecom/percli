@@ -5,7 +5,7 @@ const maven = require('maven')
 const path  = require('path')
 const fileUrl = require('file-url')
 
-args.version('1.0.0')
+args.version(require('../package.json').version)
 	.usage('[options] <projectname>')
 	.parse(process.argv)
 

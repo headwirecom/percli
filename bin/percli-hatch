@@ -4,7 +4,7 @@ const args  = require('commander')
 
 const gen = require('../lib/htmltovue.js')
 
-args.version('1.0.0')
+args.version(require('../package.json').version)
 	.option('-c, --compile', 'compile (build) the component')
     .option('-d, --deploy', 'deploy to server (note, if the model.json file has been changed a full build is necessary)')
 	.option('-f, --dialog', 'only convert the dialog')

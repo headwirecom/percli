@@ -8,7 +8,7 @@ const maven	  = require('maven')
 const watch   = require('node-watch');
 const ignore  = require('ignore')
 
-args.version('1.0.0')
+args.version(require('../package.json').version)
 	.option('-w, --watch', 'watch project and recompile')
     .option('-d, --deploy', 'deploy to server')
 	.parse(process.argv)

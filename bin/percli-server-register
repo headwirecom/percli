@@ -18,7 +18,7 @@ const {
   downloadFiles 
 } = require('../lib/fetch')
 
-args.version('1.0.0')
+args.version(require('../package.json').version)
   .usage('[options] <componentName>')
   .parse(process.argv)
 

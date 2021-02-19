@@ -9,7 +9,7 @@ const templates = require('../templates/index.js')
 const generator = require('../lib/generator.js')
 const functions = require('../lib/functions.js')
 
-args.version('1.0.0')
+args.version(require('../package.json').version)
 	.usage('[options] <componentName>')
     .option('-c, --container', 'component is a container (may contain other components)')
     .option('-f, --force', 'force creation (deletes current stub)')

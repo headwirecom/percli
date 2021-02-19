@@ -3,8 +3,8 @@
 var args  = require('commander')
 var semver = require('semver')
 
-if(semver.satisfies(semver.clean(process.version), '>=7.10.0')) {
-    args.version('1.0.0')
+if(semver.satisfies(semver.clean(process.version), '>=14.0.0')) {
+    args.version(require('../package.json').version)
         .usage('<command> [options]')
         .command('check', 'hepful checks')
         .command('server', 'server specific commands')
@@ -17,7 +17,7 @@ if(semver.satisfies(semver.clean(process.version), '>=7.10.0')) {
 }
 else {
 	console.log()
-	console.log('[ERROR] percli requires nodejs version 7.10.0 or greater')
+	console.log('[ERROR] percli requires nodejs version 14.0.0 or greater')
     console.log()
 }
 

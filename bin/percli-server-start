@@ -6,7 +6,7 @@ const { peregrineBanner } = require('../lib/banner.js')
 const fs = require('fs')
 const path = require('path')
 
-args.version('1.0.0')
+args.version(require('../package.json').version)
     .option('-a, --author', 'start as author')
     .option('-s, --standalone', 'start as standalone')
     .option('-p, --publish', 'start as publish')

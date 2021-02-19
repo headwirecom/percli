@@ -19,10 +19,10 @@ const {
   downloadFiles 
 } = require('../lib/fetch')
 
-args.version('1.0.0')
+args.version(require('../package.json').version)
   .option('-d, --download', 'only download')
   .option('-e, --existing', 'install on running server')
-  .option('-s, --sling [version]',  'force sling version')
+//  .option('-s, --sling [version]',  'force sling version')
   .option('-i, --install',  'only install')
   .option('-a, --author',  'install as author')
   .option('-p, --publish',  'install as publish')
@@ -30,24 +30,18 @@ args.version('1.0.0')
   .option('-n, --name [name]',  'register server with given name')
   .parse(process.argv)
 
-let port = 8080
-if(args.publish) {
-    port = 8180
-}
+// default
+let port = args.port ? args.port : (args.publish ? 8180: 8080)
 
-if(args.port) {
-    port = args.port
-}
-
-let sling = 9;
-if(args.sling) {
-  if(args.sling === '9' || args.sling === '11') {
-    sling = parseInt(args.sling);
-  } else {
-    console.log('only sling-9 and sling-11 are supported at this time - for other versions please log an enhancements request')
-    process.exit(-1);
-  }
-}
+let sling = 12;
+// if(args.sling) {
+//   if(args.sling === '9' || args.sling === '11') {
+//     sling = parseInt(args.sling);
+//   } else {
+//     console.log('only sling-9 and sling-11 are supported at this time - for other versions please log an enhancements request')
+//     process.exit(-1);
+//   }
+// }
 
 /* Flow Control ==========
 ========================== */
@@ -72,11 +66,9 @@ async function serverInstall() {
         // step 2
         var packagesList = await getPackageList(sling)
 
-        //step 3
-        await downloadFile(`https://vagrant.headwire.com/sling/9/org.apache.sling.launchpad-${sling}.jar`, `sling-${sling}.jar`)
-
         // step 4
         await downloadFiles(packagesList, sling)
+        process.exit(0)
     }
 
     setPort(port)

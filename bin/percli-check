@@ -3,7 +3,7 @@
 const args    = require('commander')
 const checkAvailable = require('../lib/available.js')
 
-args.version('1.0.0')
+args.version(require('../package.json').version)
     .usage('<technology>')
 	.parse(process.argv)
 
