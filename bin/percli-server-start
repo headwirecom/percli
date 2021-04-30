@@ -10,24 +10,27 @@ args.version('1.0.0')
     .option('-a, --author', 'start as author')
     .option('-s, --standalone', 'start as standalone')
     .option('-p, --publish', 'start as publish')
-    .option('-d, --debug', 'start with debugging enabled (default port=30303)')
+    .option('-d, --debug [port]', 'start with debugging enabled and optional port', '30303')
+    .option('-u, --suspend [port]', 'start with suspended debugging enabled and option port', '30303')
     .option('-n, --name [name]', 'start server by name')
+    .description("Starts a Peregrine Server instance that's already installed\n\n" +
+        "Note: if a suspended debugging session is cancelled before Peregrine is started it needs to be manually stopped")
     .parse(process.argv)
 
-async function serverStart(type){
+async function serverStart(type, debugging, debugPort, suspended){
     await peregrineBanner()
     try {
-        await startPeregrine(type, args.debug)
+        await startPeregrine(type, debugging, debugPort, suspended)
     } catch(error) {
         console.error(error);
     }
 }
 
-async function runPromptAndStart(type) {
+async function runPromptAndStart(type, debugging, debugPort, suspended) {
     await peregrineBanner()
     const inputName = await promptAddServer(process.cwd())
     try {
-        await startPeregrine(type, args.debug)
+        await startPeregrine(type, debugging, debugPort, suspended)
         if (!getPathForServer(inputName)) {
             addServer(inputName, process.cwd())
             console.log('Registering server '+inputName+' to path: '+process.cwd())
@@ -35,6 +38,26 @@ async function runPromptAndStart(type) {
     } catch(error) {
         console.error(error);
     }
+}
+
+debugging = false
+suspended = false
+if(args.debug) {
+    if(args.debug === true) {
+        debugPort = "30303";
+    } else {
+        debugPort = args.debug
+    }
+    debugging = true;
+}
+if(args.suspend) {
+    if(args.suspend === true) {
+        debugPort = "30303";
+    } else {
+        debugPort = args.suspend
+    }
+    debugging = true;
+    suspended = true
 }
 
 if(typeof args.name === 'string') {
@@ -49,7 +72,7 @@ if(typeof args.name === 'string') {
             let port = getSlingPort(path.join(serverPath, 'sling', 'sling.properties'))
             setPort(port)
             process.chdir(serverPath)
-            serverStart('standalone')
+            serverStart('standalone', debugging, debugPort, suspended)
         } catch(err) {
             console.error('server at path',serverPath,'does not exist')
         }
@@ -58,24 +81,24 @@ if(typeof args.name === 'string') {
     }
 } else if (pathRegistered(process.cwd())) {
     if(args.author) {
-        serverStart('author')
+        serverStart('author', debugging, debugPort, suspended)
     } else if(args.publish) {
         setPort(8180)
-        serverStart('publish')
+        serverStart('publish', debugging, debugPort, suspended)
     } else {
         let port = getSlingPort(path.join('sling', 'sling.properties'))
         setPort(port)
-        serverStart('standalone')
+        serverStart('standalone', debugging, debugPort, suspended)
     }
 } else {
 
     if(args.author) {
-        runPromptAndStart('author')
+        runPromptAndStart('author', debugging, debugPort, suspended)
     } else if(args.publish) {
         setPort(8180)
-        runPromptAndStart('publish')
+        runPromptAndStart('publish', debugging, debugPort, suspended)
     } else {
-        runPromptAndStart('standalone')
+        runPromptAndStart('standalone', debugging, debugPort, suspended)
     }
 }
 
